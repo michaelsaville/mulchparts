@@ -283,16 +283,42 @@ app.get('/contact', (_req, res) => res.redirect('/quote'));
 
 // ─── Admin (Basic Auth) ────────────────────────────────────────────
 
-const adminUser = process.env.MULCHPARTS_ADMIN_USER || 'admin';
-const adminPassword = process.env.MULCHPARTS_ADMIN_PASSWORD;
-if (!adminPassword) {
-  console.error('MULCHPARTS_ADMIN_PASSWORD must be set');
+// Build the admin user table. Two formats are supported:
+//
+//   MULCHPARTS_ADMIN_USERS=user1:pass1,user2:pass2     (preferred — multi-user)
+//   MULCHPARTS_ADMIN_USER=...  + MULCHPARTS_ADMIN_PASSWORD=...   (legacy single)
+//
+// The multi-user form wins when set; the singular pair is kept for backward
+// compatibility with the original .env from initial deploy. Note the simple
+// parser splits on first ":" only, so passwords may contain ":". Passwords
+// with literal "," need to be set via the JSON form (TODO if ever needed).
+const adminUsers = {};
+if (process.env.MULCHPARTS_ADMIN_USERS) {
+  for (const entry of process.env.MULCHPARTS_ADMIN_USERS.split(',')) {
+    const idx = entry.indexOf(':');
+    if (idx <= 0) continue;
+    const user = entry.slice(0, idx).trim();
+    const pass = entry.slice(idx + 1);
+    if (user && pass) adminUsers[user] = pass;
+  }
+}
+if (Object.keys(adminUsers).length === 0) {
+  const adminUser = process.env.MULCHPARTS_ADMIN_USER || 'admin';
+  const adminPassword = process.env.MULCHPARTS_ADMIN_PASSWORD;
+  if (adminPassword) adminUsers[adminUser] = adminPassword;
+}
+if (Object.keys(adminUsers).length === 0) {
+  console.error(
+    'No admin credentials — set MULCHPARTS_ADMIN_USERS=user1:pass1,user2:pass2',
+  );
   process.exit(1);
 }
+console.log(`admin users loaded: ${Object.keys(adminUsers).join(', ')}`);
+
 app.use(
   '/admin',
   basicAuth({
-    users: { [adminUser]: adminPassword },
+    users: adminUsers,
     challenge: true,
     realm: 'Mulchparts Admin',
   }),

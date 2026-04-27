@@ -24,8 +24,11 @@ services:
     restart: unless-stopped
     environment:
       DATABASE_URL: postgres://mulchparts:${POSTGRES_PASSWORD:?POSTGRES_PASSWORD must be set in .env}@db:5432/mulchparts
+      # Multi-user form (preferred). Falls back to the singular pair below
+      # when unset — see src/server.js for the parser.
+      MULCHPARTS_ADMIN_USERS: ${MULCHPARTS_ADMIN_USERS:-}
       MULCHPARTS_ADMIN_USER: ${MULCHPARTS_ADMIN_USER:-admin}
-      MULCHPARTS_ADMIN_PASSWORD: ${MULCHPARTS_ADMIN_PASSWORD:?MULCHPARTS_ADMIN_PASSWORD must be set in .env}
+      MULCHPARTS_ADMIN_PASSWORD: ${MULCHPARTS_ADMIN_PASSWORD:-}
       PUBLIC_BASE_URL: ${PUBLIC_BASE_URL:-https://mulchparts.pcc2k.com}
       NODE_ENV: production
       PORT: 3000
