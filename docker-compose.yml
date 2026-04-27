@@ -1,0 +1,43 @@
+services:
+  db:
+    image: postgres:16
+    container_name: mulchparts-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: mulchparts
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD must be set in .env}
+      POSTGRES_DB: mulchparts
+    ports:
+      # Bound to localhost only — DB is internal infrastructure.
+      - "127.0.0.1:5436:5432"
+    volumes:
+      - mulchparts_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U mulchparts -d mulchparts"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  app:
+    build: .
+    container_name: mulchparts-app
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: postgres://mulchparts:${POSTGRES_PASSWORD:?POSTGRES_PASSWORD must be set in .env}@db:5432/mulchparts
+      MULCHPARTS_ADMIN_USER: ${MULCHPARTS_ADMIN_USER:-admin}
+      MULCHPARTS_ADMIN_PASSWORD: ${MULCHPARTS_ADMIN_PASSWORD:?MULCHPARTS_ADMIN_PASSWORD must be set in .env}
+      PUBLIC_BASE_URL: ${PUBLIC_BASE_URL:-https://mulchparts.pcc2k.com}
+      NODE_ENV: production
+      PORT: 3000
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      # nginx on the PCC2K box reverse-proxies https://mulchparts.pcc2k.com → :3009
+      - "3009:3000"
+    volumes:
+      - mulchparts_uploads:/app/uploads
+
+volumes:
+  mulchparts_pgdata:
+  mulchparts_uploads:

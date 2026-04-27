@@ -1,0 +1,70 @@
+<%- include('_layout_head') %>
+  <h1>Dashboard</h1>
+
+  <section class="summary-row">
+    <div class="stat">
+      <div class="stat-num"><%= counts.parts_active %></div>
+      <div class="stat-label">Active parts</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num"><%= counts.parts %></div>
+      <div class="stat-label">Total parts</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num"><%= counts.models %></div>
+      <div class="stat-label">Models</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num"><%= counts.manufacturers %></div>
+      <div class="stat-label">Manufacturers</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num" style="color: <%= counts.new_requests > 0 ? 'var(--accent)' : 'var(--navy)' %>;">
+        <%= counts.new_requests %>
+      </div>
+      <div class="stat-label">New requests</div>
+    </div>
+  </section>
+
+  <h2>Recent quote requests</h2>
+  <% if (recent.length === 0) { %>
+    <p class="empty">No requests yet.</p>
+  <% } else { %>
+    <table class="data">
+      <thead>
+        <tr>
+          <th>When</th>
+          <th>Customer</th>
+          <th>Part</th>
+          <th>Status</th>
+          <th>Email</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% recent.forEach(r => { %>
+          <tr onclick="location.href='/admin/requests/<%= r.id %>'" style="cursor:pointer;">
+            <td class="muted"><%= new Date(r.created_at).toISOString().slice(0,16).replace('T',' ') %></td>
+            <td><strong><%= r.customer_name %></strong></td>
+            <td>
+              <% if (r.part_name) { %>
+                <%= r.manufacturer ?? '' %> <%= r.part_name %>
+              <% } else { %>
+                <span class="muted">general contact</span>
+              <% } %>
+            </td>
+            <td><span class="status-pill status-<%= r.status %>"><%= r.status %></span></td>
+            <td>
+              <% if (r.email_error) { %>
+                <span class="danger" title="<%= r.email_error %>">⚠ failed</span>
+              <% } else { %>
+                <span class="muted" style="color: var(--ok);">✓ sent</span>
+              <% } %>
+            </td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  <% } %>
+
+  <p style="margin-top:18px;"><a href="/admin/requests" class="btn btn-secondary">All requests →</a></p>
+<%- include('_layout_foot') %>

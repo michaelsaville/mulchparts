@@ -1,0 +1,40 @@
+<%- include('_layout_head') %>
+  <div class="wizard-steps">
+    <span>1. Upload</span>
+    <span class="active">→ Pick sheet</span>
+    <span>2. Map columns</span>
+    <span>3. Preview</span>
+    <span>4. Done</span>
+  </div>
+
+  <h1>Pick a sheet</h1>
+  <p class="meta">
+    <code><%= filename %></code> has <%= sheets.length %> sheets — which
+    one holds the parts data?
+  </p>
+
+  <% if (error) { %><div class="error-banner"><%= error %></div><% } %>
+
+  <form action="/admin/import/<%= sid %>/pick-sheet" method="post" style="max-width:640px;">
+    <% sheets.forEach((s, idx) => {
+         const sampleKeys = s.sample ? Object.keys(s.sample).slice(0, 6).join(' · ') : '';
+    %>
+      <label class="field-row" style="cursor: pointer;">
+        <div class="header">
+          <input type="radio" name="sheet" value="<%= s.name %>" <%= idx === 0 ? 'checked' : '' %> required style="margin-right: 8px; accent-color: var(--accent);" />
+          <strong><%= s.name %></strong>
+          <span class="sample">
+            <%= s.rowCount.toLocaleString() %> rows
+            <% if (sampleKeys) { %> · headers: <%= sampleKeys %><% } %>
+          </span>
+        </div>
+        <div></div>
+      </label>
+    <% }) %>
+
+    <div class="form-actions" style="margin-top:14px;">
+      <button type="submit" class="btn btn-primary">Continue →</button>
+      <a href="/admin/import" class="btn btn-secondary">← Re-upload</a>
+    </div>
+  </form>
+<%- include('_layout_foot') %>

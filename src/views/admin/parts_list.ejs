@@ -1,0 +1,74 @@
+<%- include('_layout_head') %>
+  <div style="display:flex; align-items:baseline; justify-content:space-between; gap:12px; flex-wrap:wrap;">
+    <h1 style="margin:0;">Parts (<%= parts.length %>)</h1>
+    <div style="display:flex; gap:8px;">
+      <a href="/admin/parts/new" class="btn btn-primary">+ New part</a>
+      <a href="/admin/import" class="btn btn-secondary">Import from spreadsheet</a>
+    </div>
+  </div>
+
+  <form class="filter-bar" method="get" action="/admin/parts" style="margin-top:18px;">
+    <input type="search" name="q" value="<%= filter.q %>" placeholder="Search part name, description, or part #" />
+    <select name="manufacturer" onchange="this.form.submit()">
+      <option value="">All manufacturers</option>
+      <% manufacturers.forEach(m => { %>
+        <option value="<%= m.id %>" <%= filter.manufacturerId === m.id ? 'selected' : '' %>><%= m.name %></option>
+      <% }) %>
+    </select>
+    <button type="submit" class="btn btn-secondary">Filter</button>
+    <% if (filter.q || filter.manufacturerId) { %>
+      <a href="/admin/parts" class="muted-link">clear</a>
+    <% } %>
+  </form>
+
+  <% if (parts.length === 0) { %>
+    <p class="empty">No parts match. <a href="/admin/parts/new">Add one</a> or <a href="/admin/import">import a sheet</a>.</p>
+  <% } else { %>
+    <table class="data">
+      <thead>
+        <tr>
+          <th></th>
+          <th>Part</th>
+          <th>Manufacturer · Model</th>
+          <th>Part #</th>
+          <th>Status</th>
+          <th class="actions">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% parts.forEach(p => { %>
+          <tr>
+            <td style="width:54px;">
+              <% if (p.photo_filename) { %>
+                <img src="/uploads/<%= p.photo_filename %>" alt="" style="width:48px;height:48px;object-fit:cover;border-radius:4px;" />
+              <% } else { %>
+                <div style="width:48px;height:48px;background:var(--bg-panel);border-radius:4px;"></div>
+              <% } %>
+            </td>
+            <td>
+              <a href="/admin/parts/<%= p.id %>/edit" style="font-weight:600;"><%= p.part_name %></a>
+              <% if (p.description) { %>
+                <div class="muted" style="font-size:0.8rem; max-width:380px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;"><%= p.description %></div>
+              <% } %>
+            </td>
+            <td>
+              <%= p.manufacturer %> <span class="muted">·</span> <%= p.machine_model %>
+            </td>
+            <td class="pn"><%= p.part_number ?? '—' %></td>
+            <td>
+              <% if (p.is_active) { %>
+                <span class="status-pill" style="background:#dcfce7;color:#166534;">Active</span>
+              <% } else { %>
+                <span class="status-pill" style="background:#e2e8f0;color:#475569;">Hidden</span>
+              <% } %>
+            </td>
+            <td class="actions">
+              <a href="/admin/parts/<%= p.id %>/edit" class="btn btn-secondary btn-sm">Edit</a>
+              <a href="/parts/<%= p.id %>" target="_blank" class="btn btn-secondary btn-sm">View ↗</a>
+            </td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  <% } %>
+<%- include('_layout_foot') %>

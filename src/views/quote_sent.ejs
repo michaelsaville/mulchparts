@@ -1,0 +1,17 @@
+<%- include('_head') %>
+  <section class="thank-you">
+    <h1>Thanks — your request is in.</h1>
+    <p>
+      A specialist will follow up by email or phone, typically the same business day
+      during our posted hours (<%= settings.business_hours %>).
+    </p>
+    <p>
+      In a hurry? Call us at
+      <a class="phone-cta" href="tel:<%= settings.business_phone %>"><%= settings.business_phone %></a>.
+    </p>
+    <div class="hero-cta">
+      <a class="btn btn-primary" href="/parts">Browse more parts</a>
+      <a class="btn btn-secondary" href="/">Back to home</a>
+    </div>
+  </section>
+<%- include('_foot') %>

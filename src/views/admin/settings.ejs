@@ -1,0 +1,110 @@
+<%- include('_layout_head') %>
+  <h1>Settings</h1>
+  <p class="meta">Used by the contact form, outbound email, and the public site's header / footer.</p>
+
+  <% if (saved) { %><div class="ok-banner">Saved.</div><% } %>
+
+  <form action="/admin/settings" method="post" class="form-stack" style="max-width:760px;">
+    <fieldset style="border:1px solid var(--border-soft); padding:16px 18px; border-radius:8px;">
+      <legend style="font-weight:600; padding:0 6px; color:var(--navy);">Quote delivery</legend>
+
+      <label>
+        <span>Destination email * <span class="muted" style="font-weight:400;">(where customer requests are sent)</span></span>
+        <input type="email" name="destination_email" value="<%= settings.destination_email || '' %>" required />
+      </label>
+
+      <label style="margin-top:10px;">
+        <span>Reply-To <span class="muted" style="font-weight:400;">(optional — defaults to the customer's email)</span></span>
+        <input type="email" name="reply_to_email" value="<%= settings.reply_to_email || '' %>" />
+      </label>
+    </fieldset>
+
+    <fieldset style="border:1px solid var(--border-soft); padding:16px 18px; border-radius:8px;">
+      <legend style="font-weight:600; padding:0 6px; color:var(--navy);">SMTP (GoDaddy 365 or any SMTP provider)</legend>
+
+      <div class="form-row">
+        <label>
+          <span>SMTP host *</span>
+          <input type="text" name="smtp_host" value="<%= settings.smtp_host || '' %>" required />
+        </label>
+        <label>
+          <span>Port</span>
+          <input type="number" name="smtp_port" value="<%= settings.smtp_port || '587' %>" />
+        </label>
+      </div>
+
+      <label style="margin-top:10px;">
+        <span>SMTP username * <span class="muted" style="font-weight:400;">(usually the From address)</span></span>
+        <input type="text" name="smtp_user" value="<%= settings.smtp_user || '' %>" required autocomplete="off" />
+      </label>
+
+      <label style="margin-top:10px;">
+        <span>SMTP password <span class="muted" style="font-weight:400;">(leave blank to keep existing)</span></span>
+        <input type="password" name="smtp_password" placeholder="••••••••" autocomplete="new-password" />
+      </label>
+
+      <label style="display:flex; align-items:center; gap:8px; margin-top:14px;">
+        <input type="checkbox" name="smtp_secure" value="true" <%= settings.smtp_secure === 'true' ? 'checked' : '' %> style="width:auto; min-height:auto;" />
+        <span style="margin-bottom:0;">Use implicit TLS (port 465). Leave unchecked for STARTTLS on 587.</span>
+      </label>
+
+      <div class="form-row" style="margin-top:14px;">
+        <label>
+          <span>From email *</span>
+          <input type="email" name="from_email" value="<%= settings.from_email || '' %>" required />
+        </label>
+        <label>
+          <span>From name</span>
+          <input type="text" name="from_name" value="<%= settings.from_name || '' %>" />
+        </label>
+      </div>
+    </fieldset>
+
+    <fieldset style="border:1px solid var(--border-soft); padding:16px 18px; border-radius:8px;">
+      <legend style="font-weight:600; padding:0 6px; color:var(--navy);">Public-facing business info</legend>
+      <p class="fine" style="margin:0 0 10px;">Shown in the header and footer of every public page.</p>
+
+      <label>
+        <span>Business name</span>
+        <input type="text" name="business_name" value="<%= settings.business_name || '' %>" />
+      </label>
+
+      <label style="margin-top:10px;">
+        <span>Address</span>
+        <input type="text" name="business_address" value="<%= settings.business_address || '' %>" />
+      </label>
+
+      <div class="form-row" style="margin-top:10px;">
+        <label>
+          <span>Phone</span>
+          <input type="tel" name="business_phone" value="<%= settings.business_phone || '' %>" />
+        </label>
+        <label>
+          <span>Email (public)</span>
+          <input type="email" name="business_email" value="<%= settings.business_email || '' %>" />
+        </label>
+      </div>
+
+      <label style="margin-top:10px;">
+        <span>Hours</span>
+        <input type="text" name="business_hours" value="<%= settings.business_hours || '' %>" />
+      </label>
+    </fieldset>
+
+    <fieldset style="border:1px solid var(--border-soft); padding:16px 18px; border-radius:8px;">
+      <legend style="font-weight:600; padding:0 6px; color:var(--navy);">Homepage hero</legend>
+      <label>
+        <span>Headline</span>
+        <input type="text" name="hero_headline" value="<%= settings.hero_headline || '' %>" />
+      </label>
+      <label style="margin-top:10px;">
+        <span>Subhead</span>
+        <textarea name="hero_subhead" rows="3"><%= settings.hero_subhead || '' %></textarea>
+      </label>
+    </fieldset>
+
+    <div class="form-actions">
+      <button type="submit" class="btn btn-primary">Save settings</button>
+    </div>
+  </form>
+<%- include('_layout_foot') %>

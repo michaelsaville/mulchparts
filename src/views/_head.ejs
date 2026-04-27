@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#1e3a8a" />
+  <title><%= title %></title>
+  <link rel="stylesheet" href="/public/style.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <a class="brand" href="/">
+        <span class="brand-name"><%= settings.business_name %></span>
+        <span class="brand-tag">Quote Catalog</span>
+      </a>
+      <nav class="topnav">
+        <a href="/parts">Parts</a>
+        <a href="/quote">Contact</a>
+      </nav>
+      <a class="topbar-phone" href="tel:<%= settings.business_phone %>">
+        ☏ <%= settings.business_phone %>
+      </a>
+    </div>
+  </header>
+  <main class="wrap">

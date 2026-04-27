@@ -1,0 +1,147 @@
+<%- include('_layout_head') %>
+  <div class="wizard-steps">
+    <span>1. Upload</span>
+    <span>2. Map columns</span>
+    <span class="active">3. Preview</span>
+    <span>4. Done</span>
+  </div>
+
+  <h1>Preview</h1>
+  <p class="meta"><code><%= filename %></code> · <%= rowCount.toLocaleString() %> rows analyzed</p>
+
+  <section class="summary-row">
+    <div class="stat">
+      <div class="stat-num" style="color:var(--ok);"><%= counts.fresh.toLocaleString() %></div>
+      <div class="stat-label">New parts</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num" style="color:var(--accent);"><%= counts.dupes.toLocaleString() %></div>
+      <div class="stat-label">Duplicates (decide below)</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num" style="color:<%= counts.invalid > 0 ? 'var(--error)' : 'var(--muted)' %>;"><%= counts.invalid.toLocaleString() %></div>
+      <div class="stat-label">Invalid (skipped)</div>
+    </div>
+  </section>
+
+  <form action="/admin/import/<%= sid %>/commit" method="post">
+    <% if (counts.dupes > 0) { %>
+      <h2>Duplicates — decide what to do</h2>
+      <p class="fine">
+        These rows match a part already in the catalog. Pick a default
+        below, or override per row. Two parts may share a name and still
+        be distinct sub-parts (different specs, fitment, material) — when
+        in doubt, choose <strong>Sub-part (insert as new)</strong>.
+      </p>
+
+      <p style="display:flex; gap:8px; flex-wrap:wrap; margin: 10px 0 16px;">
+        <label class="chip"><input type="radio" name="default_resolution" value="skip" checked /> Skip all</label>
+        <label class="chip"><input type="radio" name="default_resolution" value="subpart" /> Treat all as sub-parts</label>
+        <label class="chip"><input type="radio" name="default_resolution" value="update" /> Update all</label>
+      </p>
+      <p class="fine" style="margin-top:0;">
+        <strong>Skip</strong> = re-entry of the same part already in the catalog.
+        <strong>Sub-part</strong> = same name but a different variant — insert as a new part.
+        <strong>Update</strong> = same part, refresh the description / part # / notes.
+      </p>
+
+      <table class="preview">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Manufacturer</th>
+            <th>Model</th>
+            <th>Part</th>
+            <th>Part #</th>
+            <th>Override</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% dupes.forEach(p => { %>
+            <tr class="dupe-row">
+              <td class="muted"><%= p.sheetRow %></td>
+              <td><%= p.normalized.manufacturer %></td>
+              <td><%= p.normalized.machine_model %></td>
+              <td>
+                <strong><%= p.normalized.part_name %></strong>
+                <% if (p.normalized.description) { %>
+                  <div class="muted" style="font-size:0.78rem; max-width:280px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;"><%= p.normalized.description %></div>
+                <% } %>
+              </td>
+              <td class="pn"><%= p.normalized.part_number ?? '—' %></td>
+              <td class="choice">
+                <label><input type="radio" name="dupe[<%= p.idx %>]" value="" checked /> default</label>
+                <label><input type="radio" name="dupe[<%= p.idx %>]" value="skip" /> skip</label>
+                <label><input type="radio" name="dupe[<%= p.idx %>]" value="subpart" /> sub-part</label>
+                <label><input type="radio" name="dupe[<%= p.idx %>]" value="update" /> update</label>
+              </td>
+            </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    <% } else { %>
+      <p class="fine">No duplicates — every row will be a fresh insert.</p>
+      <input type="hidden" name="default_resolution" value="skip" />
+    <% } %>
+
+    <% if (counts.fresh > 0) { %>
+      <h2>New parts (first <%= Math.min(fresh.length, 30) %> of <%= counts.fresh %>)</h2>
+      <table class="preview">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Manufacturer</th>
+            <th>Model</th>
+            <th>Part</th>
+            <th>Part #</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% fresh.forEach(p => { %>
+            <tr>
+              <td class="muted"><%= p.sheetRow %></td>
+              <td><%= p.normalized.manufacturer %></td>
+              <td><%= p.normalized.machine_model %></td>
+              <td>
+                <strong><%= p.normalized.part_name %></strong>
+                <% if (p.normalized.description) { %>
+                  <div class="muted" style="font-size:0.78rem; max-width:280px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;"><%= p.normalized.description %></div>
+                <% } %>
+              </td>
+              <td class="pn"><%= p.normalized.part_number ?? '—' %></td>
+            </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    <% } %>
+
+    <% if (counts.invalid > 0) { %>
+      <h2>Invalid rows (will be skipped)</h2>
+      <p class="fine">Showing first <%= Math.min(invalid.length, 30) %> of <%= counts.invalid %>. Fix the source spreadsheet and re-upload to import these.</p>
+      <table class="preview">
+        <thead>
+          <tr><th>#</th><th>Issues</th><th>Row data</th></tr>
+        </thead>
+        <tbody>
+          <% invalid.forEach(p => { %>
+            <tr>
+              <td class="muted"><%= p.sheetRow %></td>
+              <td class="muted"><%= p.issues.join('; ') %></td>
+              <td class="muted" style="font-size:0.78rem;">
+                <%= [p.normalized.manufacturer, p.normalized.machine_model, p.normalized.part_name].filter(Boolean).join(' · ') || '(empty)' %>
+              </td>
+            </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    <% } %>
+
+    <div class="form-actions" style="margin-top:18px;">
+      <button type="submit" class="btn btn-primary">Apply import</button>
+      <a href="/admin/import/<%= sid %>/map" class="btn btn-secondary">← Back to mapping</a>
+      <form action="/admin/import/<%= sid %>/cancel" method="post" style="display:inline">
+        <button type="submit" class="btn btn-secondary">Cancel</button>
+      </form>
+    </div>
+  </form>
+<%- include('_layout_foot') %>

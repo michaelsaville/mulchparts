@@ -1,0 +1,62 @@
+<%- include('_head') %>
+  <section class="hero">
+    <h1><%= settings.hero_headline %></h1>
+    <p><%= settings.hero_subhead %></p>
+    <div class="hero-cta">
+      <a class="btn btn-primary" href="/parts">Browse parts →</a>
+      <a class="btn btn-secondary" href="/quote">Contact a specialist</a>
+    </div>
+  </section>
+
+  <section class="stat-row">
+    <div class="stat">
+      <div class="stat-num"><%= counts.parts.toLocaleString() %></div>
+      <div class="stat-label">Parts in catalog</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num"><%= counts.models %></div>
+      <div class="stat-label">Machine models</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num"><%= counts.manufacturers %></div>
+      <div class="stat-label">Manufacturers</div>
+    </div>
+  </section>
+
+  <% if (manufacturers.length > 0) { %>
+    <h2>Browse by manufacturer</h2>
+    <ul class="card-grid">
+      <% manufacturers.forEach(m => { %>
+        <li>
+          <a class="card" href="/parts?manufacturer=<%= m.id %>">
+            <div class="card-title"><%= m.name %></div>
+            <div class="card-meta">
+              <%= m.model_count %> model<%= m.model_count === 1 ? '' : 's' %> ·
+              <%= m.part_count %> part<%= m.part_count === 1 ? '' : 's' %>
+            </div>
+          </a>
+        </li>
+      <% }) %>
+    </ul>
+  <% } else { %>
+    <p class="empty">
+      The catalog is empty. Admins can populate it via
+      <a href="/admin/import">the import wizard</a>.
+    </p>
+  <% } %>
+
+  <section class="trust-row">
+    <div class="trust-block">
+      <h3>American-made steel</h3>
+      <p>Every part fabricated in our shop with skilled American workers. Quality you can stand behind.</p>
+    </div>
+    <div class="trust-block">
+      <h3>Specs that match your machine</h3>
+      <p>We don't sell off-the-shelf — every quote includes confirmation of fit, material grade, and lead time.</p>
+    </div>
+    <div class="trust-block">
+      <h3>Fast follow-up</h3>
+      <p>Quote requests reach a real person, usually answered the same business day during posted hours.</p>
+    </div>
+  </section>
+<%- include('_foot') %>

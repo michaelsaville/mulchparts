@@ -1,0 +1,57 @@
+<%- include('_head') %>
+  <h1>Parts catalog</h1>
+  <p class="meta"><%= parts.length %> part<%= parts.length === 1 ? '' : 's' %> shown</p>
+
+  <form class="filter-bar" method="get" action="/parts">
+    <input type="search" name="q" value="<%= filter.q %>" placeholder="Search part name, description, or part #" />
+    <select name="manufacturer" onchange="this.form.submit()">
+      <option value="">All manufacturers</option>
+      <% manufacturers.forEach(m => { %>
+        <option value="<%= m.id %>" <%= filter.manufacturerId === m.id ? 'selected' : '' %>><%= m.name %></option>
+      <% }) %>
+    </select>
+    <% if (models.length > 0) { %>
+      <select name="model" onchange="this.form.submit()">
+        <option value="">All models</option>
+        <% models.forEach(m => { %>
+          <option value="<%= m.id %>" <%= filter.modelId === m.id ? 'selected' : '' %>><%= m.name %></option>
+        <% }) %>
+      </select>
+    <% } %>
+    <button type="submit" class="btn btn-secondary">Filter</button>
+    <% if (filter.q || filter.manufacturerId || filter.modelId) { %>
+      <a href="/parts" class="muted-link">clear</a>
+    <% } %>
+  </form>
+
+  <% if (parts.length === 0) { %>
+    <p class="empty">No parts match the current filter.</p>
+  <% } else { %>
+    <ul class="part-grid">
+      <% parts.forEach(p => { %>
+        <li class="part-card">
+          <a href="/parts/<%= p.id %>" class="part-card-link">
+            <% if (p.photo_filename) { %>
+              <img class="part-photo" src="/uploads/<%= p.photo_filename %>" alt="<%= p.part_name %>" loading="lazy" />
+            <% } else { %>
+              <div class="part-photo placeholder">No photo</div>
+            <% } %>
+            <div class="part-card-body">
+              <div class="part-card-title"><%= p.part_name %></div>
+              <div class="part-card-meta">
+                <span><%= p.manufacturer %></span> ·
+                <span><%= p.machine_model %></span>
+              </div>
+              <% if (p.part_number) { %>
+                <div class="part-card-pn">PN <%= p.part_number %></div>
+              <% } %>
+            </div>
+          </a>
+          <div class="part-card-cta">
+            <a class="btn btn-primary btn-sm" href="/quote?partId=<%= p.id %>">Request quote</a>
+          </div>
+        </li>
+      <% }) %>
+    </ul>
+  <% } %>
+<%- include('_foot') %>

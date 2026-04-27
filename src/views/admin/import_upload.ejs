@@ -1,0 +1,52 @@
+<%- include('_layout_head') %>
+  <div class="wizard-steps">
+    <span class="active">1. Upload</span>
+    <span>2. Map columns</span>
+    <span>3. Preview</span>
+    <span>4. Done</span>
+  </div>
+
+  <h1>Import parts</h1>
+  <p class="meta">
+    Drop a vendor spreadsheet (.xlsx, .xlsm, .xls, or .csv). The wizard
+    auto-detects column headers, lets you override, then walks every
+    duplicate so we don't quietly drop sub-parts that happen to share a
+    name.
+  </p>
+
+  <% if (error) { %><div class="error-banner"><%= error %></div><% } %>
+
+  <form action="/admin/import" method="post" enctype="multipart/form-data" class="form-stack" style="max-width:640px;">
+    <label class="dropzone" id="drop">
+      <input type="file" name="file" accept=".xlsx,.xlsm,.xls,.csv" required onchange="document.getElementById('chosen').textContent = this.files[0]?.name || '';" />
+      <div style="font-size: 1.05rem; color: var(--text); margin-bottom: 4px;">Click to choose a file</div>
+      <div>or drag and drop here</div>
+      <div id="chosen" style="margin-top: 8px; color: var(--accent); font-weight: 600;"></div>
+    </label>
+    <p class="fine" style="margin-top:6px;">
+      Up to 10 MB. Manufacturer + model can be left blank on continuation
+      rows — the importer fills them down from the previous row.
+    </p>
+    <div class="form-actions">
+      <button type="submit" class="btn btn-primary">Continue →</button>
+      <a href="/admin" class="btn btn-secondary">Cancel</a>
+    </div>
+  </form>
+
+  <script>
+    const drop = document.getElementById('drop');
+    const input = drop.querySelector('input[type=file]');
+    ['dragenter','dragover'].forEach(ev => drop.addEventListener(ev, e => {
+      e.preventDefault(); drop.style.borderColor = 'var(--accent)';
+    }));
+    ['dragleave','drop'].forEach(ev => drop.addEventListener(ev, e => {
+      e.preventDefault(); drop.style.borderColor = '';
+    }));
+    drop.addEventListener('drop', e => {
+      if (e.dataTransfer?.files?.length) {
+        input.files = e.dataTransfer.files;
+        input.dispatchEvent(new Event('change'));
+      }
+    });
+  </script>
+<%- include('_layout_foot') %>

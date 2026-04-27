@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#0f172a" />
+  <meta name="robots" content="noindex,nofollow" />
+  <title><%= title %></title>
+  <link rel="stylesheet" href="/public/style.css" />
+</head>
+<body>
+  <div class="admin-bar">
+    <a class="brand" href="/admin">Mulchparts Admin</a>
+    <a href="/admin" class="<%= active === 'dashboard' ? 'active' : '' %>">Dashboard</a>
+    <a href="/admin/parts" class="<%= active === 'parts' ? 'active' : '' %>">Parts</a>
+    <a href="/admin/requests" class="<%= active === 'requests' ? 'active' : '' %>">Requests</a>
+    <a href="/admin/import" class="<%= active === 'import' ? 'active' : '' %>">Import</a>
+    <a href="/admin/settings" class="<%= active === 'settings' ? 'active' : '' %>">Settings</a>
+    <span class="spacer"></span>
+    <a href="/" target="_blank">Public site ↗</a>
+  </div>
+  <main class="wrap">

@@ -1,0 +1,26 @@
+{
+  "name": "mulchparts",
+  "version": "0.1.0",
+  "description": "Quote-only parts catalog for MinFab Mulch Parts. Public browse, contact-driven sales, admin import wizard.",
+  "type": "module",
+  "private": true,
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js",
+    "migrate": "node scripts/migrate.js"
+  },
+  "dependencies": {
+    "compression": "^1.7.5",
+    "dotenv": "^16.6.1",
+    "ejs": "^3.1.10",
+    "express": "^4.21.2",
+    "express-basic-auth": "^1.2.1",
+    "multer": "^2.1.1",
+    "nodemailer": "^6.9.16",
+    "pg": "^8.13.1",
+    "xlsx": "^0.18.5"
+  }
+}

@@ -1,0 +1,43 @@
+<%- include('_head') %>
+  <p class="breadcrumbs">
+    <a href="/parts">Parts</a> ›
+    <a href="/parts?manufacturer=<%= part.manufacturer_id %>"><%= part.manufacturer %></a> ›
+    <a href="/parts?manufacturer=<%= part.manufacturer_id %>&model=<%= part.machine_model_id %>"><%= part.machine_model %></a>
+  </p>
+
+  <h1><%= part.part_name %></h1>
+
+  <div class="part-detail-grid">
+    <div class="part-detail-photo">
+      <% if (part.photo_filename) { %>
+        <img src="/uploads/<%= part.photo_filename %>" alt="<%= part.part_name %>" />
+      <% } else { %>
+        <div class="part-photo placeholder large">No photo on file</div>
+      <% } %>
+    </div>
+
+    <div class="part-detail-body">
+      <dl class="kv">
+        <dt>Manufacturer</dt><dd><%= part.manufacturer %></dd>
+        <dt>Machine model</dt><dd><%= part.machine_model %></dd>
+        <% if (part.part_number) { %>
+          <dt>Part number</dt><dd class="mono"><%= part.part_number %></dd>
+        <% } %>
+        <% if (part.description) { %>
+          <dt>Description</dt><dd><%= part.description %></dd>
+        <% } %>
+      </dl>
+
+      <div class="cta-block">
+        <p>
+          Specs vary by build year, wear pattern, and material grade — every quote
+          is verified by a technician before pricing.
+        </p>
+        <a class="btn btn-primary btn-lg" href="/quote?partId=<%= part.id %>">Request a quote on this part</a>
+        <p class="cta-or">
+          or call <a href="tel:<%= settings.business_phone %>"><%= settings.business_phone %></a>
+        </p>
+      </div>
+    </div>
+  </div>
+<%- include('_foot') %>

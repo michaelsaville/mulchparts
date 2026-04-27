@@ -1,0 +1,83 @@
+<%- include('_layout_head') %>
+  <p><a href="/admin/parts" class="muted-link">← All parts</a></p>
+  <h1><%= part ? 'Edit part' : 'New part' %></h1>
+
+  <% if (error) { %><div class="error-banner"><%= error %></div><% } %>
+
+  <form action="/admin/parts" method="post" enctype="multipart/form-data" class="form-stack" style="max-width:760px;">
+    <% if (part) { %>
+      <input type="hidden" name="id" value="<%= part.id %>" />
+    <% } %>
+
+    <fieldset style="border:1px solid var(--border-soft); padding:14px 16px; border-radius:8px;">
+      <legend style="font-size:0.78rem; text-transform:uppercase; letter-spacing:0.05em; color:var(--muted); padding:0 6px;">Manufacturer + machine model</legend>
+      <p class="fine" style="margin:0 0 10px;">Pick an existing pair, or type a new one to create on the fly.</p>
+
+      <label>
+        <span>Existing model</span>
+        <select name="machine_model_id" id="model-select">
+          <option value="">— create new below —</option>
+          <% manufacturers.forEach(m => { %>
+            <% (m.models || []).forEach(mm => { %>
+              <option value="<%= mm.id %>" <%= part && part.machine_model_id === mm.id ? 'selected' : '' %>>
+                <%= m.name %> · <%= mm.name %>
+              </option>
+            <% }) %>
+          <% }) %>
+        </select>
+      </label>
+
+      <div class="form-row" style="margin-top:10px;">
+        <label>
+          <span>New manufacturer name</span>
+          <input type="text" name="manufacturer_name" placeholder="e.g. Diamond Z" />
+        </label>
+        <label>
+          <span>New model name</span>
+          <input type="text" name="machine_model_name" placeholder="e.g. 1136B" />
+        </label>
+      </div>
+    </fieldset>
+
+    <label>
+      <span>Part name *</span>
+      <input type="text" name="part_name" required value="<%= part?.part_name || '' %>" />
+    </label>
+
+    <label>
+      <span>Description</span>
+      <textarea name="description" rows="4"><%= part?.description || '' %></textarea>
+    </label>
+
+    <div class="form-row">
+      <label>
+        <span>Part number (optional)</span>
+        <input type="text" name="part_number" value="<%= part?.part_number || '' %>" />
+      </label>
+      <label style="display:flex; align-items:flex-end; gap:8px; padding-bottom:11px;">
+        <input type="checkbox" name="is_active" <%= !part || part.is_active ? 'checked' : '' %> style="width:auto; min-height:auto;" />
+        <span style="margin-bottom:0;">Active (visible to customers)</span>
+      </label>
+    </div>
+
+    <label>
+      <span>Internal notes (admin only — not shown publicly)</span>
+      <textarea name="internal_notes" rows="3"><%= part?.internal_notes || '' %></textarea>
+    </label>
+
+    <label>
+      <span>Photo<% if (part?.photo_filename) { %> (current: <a href="/uploads/<%= part.photo_filename %>" target="_blank"><%= part.photo_filename %></a>)<% } %></span>
+      <input type="file" name="photo" accept="image/jpeg,image/png,image/webp,image/gif" />
+    </label>
+
+    <div class="form-actions">
+      <button type="submit" class="btn btn-primary"><%= part ? 'Save changes' : 'Create part' %></button>
+      <a href="/admin/parts" class="btn btn-secondary">Cancel</a>
+      <% if (part) { %>
+        <form action="/admin/parts/<%= part.id %>/delete" method="post" style="margin-left:auto;" onsubmit="return confirm('Delete this part? Quote requests linked to it will keep their copy of the part name.');">
+          <button type="submit" class="btn btn-danger">Delete part</button>
+        </form>
+      <% } %>
+    </div>
+  </form>
+<%- include('_layout_foot') %>

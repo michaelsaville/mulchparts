@@ -1,0 +1,52 @@
+<%- include('_layout_head') %>
+  <div class="wizard-steps">
+    <span>1. Upload</span>
+    <span class="active">2. Map columns</span>
+    <span>3. Preview</span>
+    <span>4. Done</span>
+  </div>
+
+  <h1>Map columns</h1>
+  <p class="meta">
+    <code><%= filename %></code> · sheet <code><%= sheetName %></code> ·
+    <%= rowCount.toLocaleString() %> rows
+  </p>
+  <p class="fine">
+    Each spreadsheet column lines up with one target field below. The wizard
+    guessed; override anything that's wrong, leave a column unmapped to skip it.
+    Required: <strong>Manufacturer</strong>, <strong>Machine model</strong>, <strong>Part name</strong>.
+  </p>
+
+  <% if (error) { %><div class="error-banner"><%= error %></div><% } %>
+
+  <form action="/admin/import/<%= sid %>/map" method="post" style="max-width:760px;">
+    <% headers.forEach(header => {
+         const samples = sample
+           .map(r => r[header])
+           .filter(v => v !== null && v !== undefined && v !== '')
+           .slice(0, 3)
+           .map(v => String(v))
+           .join(' · ');
+    %>
+      <div class="field-row">
+        <div class="header">
+          <strong><%= header %></strong>
+          <% if (samples) { %><span class="sample"><%= samples %></span><% } %>
+        </div>
+        <select name="map[<%= header %>]">
+          <option value="">— ignore —</option>
+          <% targets.forEach(t => { %>
+            <option value="<%= t.key %>" <%= mapping[header] === t.key ? 'selected' : '' %>>
+              <%= t.label %><%= t.required ? ' *' : '' %>
+            </option>
+          <% }) %>
+        </select>
+      </div>
+    <% }) %>
+
+    <div class="form-actions" style="margin-top:14px;">
+      <button type="submit" class="btn btn-primary">Preview →</button>
+      <a href="/admin/import" class="btn btn-secondary">← Re-upload</a>
+    </div>
+  </form>
+<%- include('_layout_foot') %>

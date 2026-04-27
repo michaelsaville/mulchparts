@@ -1,0 +1,39 @@
+<%- include('_layout_head') %>
+  <div class="wizard-steps">
+    <span>1. Upload</span>
+    <span>2. Map columns</span>
+    <span>3. Preview</span>
+    <span class="active">4. Done</span>
+  </div>
+
+  <h1>Import complete</h1>
+  <p class="meta"><code><%= filename %></code></p>
+
+  <section class="summary-row">
+    <div class="stat">
+      <div class="stat-num" style="color:var(--ok);"><%= summary.inserted.toLocaleString() %></div>
+      <div class="stat-label">New parts</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num" style="color:var(--accent);"><%= summary.subparts.toLocaleString() %></div>
+      <div class="stat-label">Sub-parts inserted</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num"><%= summary.updated.toLocaleString() %></div>
+      <div class="stat-label">Updated</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num"><%= summary.skipped.toLocaleString() %></div>
+      <div class="stat-label">Skipped</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num" style="color:<%= summary.invalid > 0 ? 'var(--error)' : 'var(--muted)' %>;"><%= summary.invalid.toLocaleString() %></div>
+      <div class="stat-label">Invalid</div>
+    </div>
+  </section>
+
+  <div class="form-actions">
+    <a href="/admin/parts" class="btn btn-primary">View parts →</a>
+    <a href="/admin/import" class="btn btn-secondary">Import another file</a>
+  </div>
+<%- include('_layout_foot') %>

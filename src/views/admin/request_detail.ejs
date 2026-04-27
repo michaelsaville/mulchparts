@@ -1,0 +1,61 @@
+<%- include('_layout_head') %>
+  <p><a href="/admin/requests" class="muted-link">← All requests</a></p>
+  <h1>Request #<%= request.id %></h1>
+  <p class="meta">
+    <%= new Date(request.created_at).toISOString().replace('T',' ').slice(0,19) %>
+    · <span class="status-pill status-<%= request.status %>"><%= request.status %></span>
+  </p>
+
+  <% if (request.email_error) { %>
+    <div class="error-banner">
+      <strong>Email delivery failed:</strong> <%= request.email_error %><br />
+      You'll need to follow up directly. Fix SMTP creds in
+      <a href="/admin/settings">Settings</a> so future requests deliver.
+    </div>
+  <% } %>
+
+  <div class="part-detail-grid" style="margin-top:18px;">
+    <div>
+      <h2 style="margin-top:0;">Customer</h2>
+      <dl class="kv">
+        <dt>Name</dt><dd><strong><%= request.customer_name %></strong></dd>
+        <dt>Email</dt><dd><a href="mailto:<%= request.email %>"><%= request.email %></a></dd>
+        <% if (request.phone) { %><dt>Phone</dt><dd><a href="tel:<%= request.phone %>"><%= request.phone %></a></dd><% } %>
+        <% if (request.company) { %><dt>Company</dt><dd><%= request.company %></dd><% } %>
+        <% if (request.quantity) { %><dt>Quantity</dt><dd><%= request.quantity %></dd><% } %>
+      </dl>
+
+      <% if (request.message) { %>
+        <h3>Message</h3>
+        <pre style="white-space:pre-wrap; background:var(--bg-soft); padding:12px; border-radius:6px; font-family:inherit; font-size:0.92rem; margin:0;"><%= request.message %></pre>
+      <% } %>
+    </div>
+
+    <div>
+      <h2 style="margin-top:0;">Part</h2>
+      <% if (request.part_id) { %>
+        <p>
+          <a href="/admin/parts/<%= request.part_id %>/edit" style="font-weight:600;"><%= request.part_name %></a><br />
+          <span class="muted"><%= request.manufacturer %> · <%= request.machine_model %></span>
+          <% if (request.part_number) { %><br /><span class="mono muted">PN <%= request.part_number %></span><% } %>
+        </p>
+        <% if (request.part_description) { %>
+          <p style="font-size:0.92rem;"><%= request.part_description %></p>
+        <% } %>
+        <p><a href="/parts/<%= request.part_id %>" target="_blank" class="btn btn-secondary btn-sm">View public page ↗</a></p>
+      <% } else { %>
+        <p class="muted">General contact form (no part attached)</p>
+      <% } %>
+
+      <h3>Update status</h3>
+      <form action="/admin/requests/<%= request.id %>/status" method="post" style="display:flex; gap:8px; flex-wrap:wrap;">
+        <% ['NEW', 'RESPONDED', 'CLOSED'].forEach(s => { %>
+          <button type="submit" name="status" value="<%= s %>" class="btn <%= request.status === s ? 'btn-primary' : 'btn-secondary' %> btn-sm" <%= request.status === s ? 'disabled' : '' %>>
+            <%= s %>
+          </button>
+        <% }) %>
+      </form>
+      <p class="fine">Status is for your inbox only — the customer doesn't see it.</p>
+    </div>
+  </div>
+<%- include('_layout_foot') %>

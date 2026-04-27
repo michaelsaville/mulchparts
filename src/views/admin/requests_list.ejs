@@ -1,0 +1,62 @@
+<%- include('_layout_head') %>
+  <h1>Quote requests</h1>
+
+  <p style="display:flex; gap:8px; flex-wrap:wrap; margin: 0 0 16px;">
+    <% ['', 'NEW', 'RESPONDED', 'CLOSED'].forEach(s => {
+         const label = s || 'All';
+         const isActive = statusFilter === s;
+         const href = s ? `/admin/requests?status=${s}` : '/admin/requests';
+    %>
+      <a href="<%= href %>" class="chip" style="<%= isActive ? 'background:var(--accent);color:#fff;border-color:var(--accent);font-weight:600;' : '' %>">
+        <%= label %>
+      </a>
+    <% }) %>
+  </p>
+
+  <% if (requests.length === 0) { %>
+    <p class="empty">No requests match.</p>
+  <% } else { %>
+    <table class="data">
+      <thead>
+        <tr>
+          <th>When</th>
+          <th>Customer</th>
+          <th>Part</th>
+          <th>Status</th>
+          <th>Email</th>
+          <th class="actions"></th>
+        </tr>
+      </thead>
+      <tbody>
+        <% requests.forEach(r => { %>
+          <tr>
+            <td class="muted"><%= new Date(r.created_at).toISOString().slice(0,16).replace('T',' ') %></td>
+            <td>
+              <strong><%= r.customer_name %></strong><br />
+              <span class="muted" style="font-size:0.82rem;"><%= r.email %><%= r.phone ? ' · ' + r.phone : '' %></span>
+            </td>
+            <td>
+              <% if (r.part_name) { %>
+                <%= r.manufacturer ?? '' %> <%= r.machine_model ?? '' %><br />
+                <span style="font-size:0.85rem;"><%= r.part_name %></span>
+              <% } else { %>
+                <span class="muted">general contact</span>
+              <% } %>
+            </td>
+            <td><span class="status-pill status-<%= r.status %>"><%= r.status %></span></td>
+            <td>
+              <% if (r.email_error) { %>
+                <span class="danger" title="<%= r.email_error %>">⚠ failed</span>
+              <% } else if (r.email_sent_at) { %>
+                <span style="color:var(--ok);">✓ sent</span>
+              <% } else { %>
+                <span class="muted">queued</span>
+              <% } %>
+            </td>
+            <td class="actions"><a href="/admin/requests/<%= r.id %>" class="btn btn-secondary btn-sm">Open</a></td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  <% } %>
+<%- include('_layout_foot') %>
