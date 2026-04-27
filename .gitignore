@@ -4,3 +4,6 @@ node_modules
 data/import-sessions/
 uploads/
 .DS_Store
+
+# Sample inventory file: kept locally for reference, never tracked.
+data/sample/
