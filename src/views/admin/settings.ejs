@@ -61,6 +61,40 @@
     </fieldset>
 
     <fieldset style="border:1px solid var(--border-soft); padding:16px 18px; border-radius:8px;">
+      <legend style="font-weight:600; padding:0 6px; color:var(--navy);">Push notifications (ntfy)</legend>
+      <p class="fine" style="margin:0 0 10px;">
+        New quote requests fire a push to the ntfy topic below in parallel with
+        the email — neither blocks the customer. Leave URL or topic blank to
+        disable push.
+      </p>
+
+      <p class="ok-banner" style="background:#eff6ff;border-color:#3b82f6;color:#1e3a8a;">
+        <strong>📱 To subscribe a phone:</strong> install the
+        <a href="https://ntfy.sh/app" target="_blank">ntfy app</a> on iOS or
+        Android, change the default server to
+        <code>https://mulchparts-ntfy.pcc2k.com</code>, then subscribe to the
+        <code>topic name</code> below. The internal "Server URL" field is what
+        the <em>app</em> uses to publish — leave it as <code>http://ntfy:80</code>
+        unless you've moved the ntfy server elsewhere.
+      </p>
+
+      <label>
+        <span>Server URL <span class="muted" style="font-weight:400;">(internal — what the app posts to)</span></span>
+        <input type="text" name="ntfy_url" value="<%= settings.ntfy_url || '' %>" placeholder="http://ntfy:80" />
+      </label>
+
+      <label style="margin-top:10px;">
+        <span>Topic name <span class="muted" style="font-weight:400;">(this is what phones subscribe to — keep hard to guess if anonymous)</span></span>
+        <input type="text" name="ntfy_topic" value="<%= settings.ntfy_topic || '' %>" />
+      </label>
+
+      <label style="margin-top:10px;">
+        <span>Bearer token <span class="muted" style="font-weight:400;">(optional — only if your topic requires auth)</span></span>
+        <input type="password" name="ntfy_token" placeholder="<%= settings.ntfy_token ? '••••••••' : '' %>" autocomplete="new-password" />
+      </label>
+    </fieldset>
+
+    <fieldset style="border:1px solid var(--border-soft); padding:16px 18px; border-radius:8px;">
       <legend style="font-weight:600; padding:0 6px; color:var(--navy);">Public-facing business info</legend>
       <p class="fine" style="margin:0 0 10px;">Shown in the header and footer of every public page.</p>
 

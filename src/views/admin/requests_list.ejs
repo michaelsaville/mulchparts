@@ -24,6 +24,7 @@
           <th>Part</th>
           <th>Status</th>
           <th>Email</th>
+          <th>Push</th>
           <th class="actions"></th>
         </tr>
       </thead>
@@ -51,6 +52,15 @@
                 <span style="color:var(--ok);">✓ sent</span>
               <% } else { %>
                 <span class="muted">queued</span>
+              <% } %>
+            </td>
+            <td>
+              <% if (r.ntfy_error) { %>
+                <span class="danger" title="<%= r.ntfy_error %>">⚠ failed</span>
+              <% } else if (r.ntfy_sent_at) { %>
+                <span style="color:var(--ok);">✓ sent</span>
+              <% } else { %>
+                <span class="muted">off</span>
               <% } %>
             </td>
             <td class="actions"><a href="/admin/requests/<%= r.id %>" class="btn btn-secondary btn-sm">Open</a></td>

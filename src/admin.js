@@ -340,10 +340,12 @@ export function createAdminRouter(pool, uploadsDir) {
   router.post('/settings', async (req, res, next) => {
     try {
       const patch = {};
+      // Secret-shaped fields preserve their existing value when the
+      // form is submitted blank — admins shouldn't have to retype a
+      // password / token on every save. Explicit non-blank input wins.
+      const PRESERVE_IF_BLANK = new Set(['smtp_password', 'ntfy_token']);
       for (const [k, v] of Object.entries(req.body)) {
-        // Skip the SMTP password field if blank — admins shouldn't have
-        // to retype it on every save. Anything explicitly typed wins.
-        if (k === 'smtp_password' && (!v || v.trim() === '')) continue;
+        if (PRESERVE_IF_BLANK.has(k) && (!v || v.trim() === '')) continue;
         patch[k] = (v || '').trim();
       }
       await updateSettings(patch);

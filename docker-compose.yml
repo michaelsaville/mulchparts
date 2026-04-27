@@ -41,6 +41,19 @@ services:
     volumes:
       - mulchparts_uploads:/app/uploads
 
+  ntfy:
+    image: binwiederhier/ntfy:latest
+    container_name: mulchparts-ntfy
+    restart: unless-stopped
+    command: serve
+    ports:
+      # nginx on PCC2K reverse-proxies https://mulchparts-ntfy.pcc2k.com → :8091
+      - "8091:80"
+    volumes:
+      - ./ntfy/server.yml:/etc/ntfy/server.yml:ro
+      - mulchparts_ntfy_cache:/var/cache/ntfy
+
 volumes:
   mulchparts_pgdata:
   mulchparts_uploads:
+  mulchparts_ntfy_cache:

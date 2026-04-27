@@ -1,0 +1,24 @@
+# Mulchparts ntfy config — see https://docs.ntfy.sh/config/
+#
+# Dedicated to this app. NOT shared with TicketHub's ntfy at
+# tickethub-ntfy:8090 — keeps one tenant's traffic / topic naming /
+# auth posture isolated from the other.
+#
+# Auth is intentionally anonymous + relies on a hard-to-guess topic
+# name (seeded as `mulchparts-quotes-<random>` in settings on first
+# migrate). For tighter control, set ntfy_token in /admin/settings
+# and add a matching access rule here later.
+
+base-url: "https://mulchparts-ntfy.pcc2k.com"
+listen-http: ":80"
+
+# Behind nginx — trust X-Forwarded-* headers
+behind-proxy: true
+
+# Cache so resubscribed phones see the last 24h of quote pings
+cache-file: "/var/cache/ntfy/cache.db"
+cache-duration: "24h"
+
+# Attachments off — we only ship short text messages
+attachment-cache-dir: ""
+attachment-total-size-limit: "0"

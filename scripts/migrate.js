@@ -60,8 +60,14 @@ CREATE TABLE IF NOT EXISTS quote_requests (
   user_agent      TEXT,
   email_sent_at   TIMESTAMPTZ,
   email_error     TEXT,
+  ntfy_sent_at    TIMESTAMPTZ,
+  ntfy_error      TEXT,
   created_at      TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
+-- Additive on existing deployments: idempotent ALTER for the ntfy fields
+-- (ADD COLUMN IF NOT EXISTS is Postgres-native and leaves rows alone).
+ALTER TABLE quote_requests ADD COLUMN IF NOT EXISTS ntfy_sent_at TIMESTAMPTZ;
+ALTER TABLE quote_requests ADD COLUMN IF NOT EXISTS ntfy_error TEXT;
 CREATE INDEX IF NOT EXISTS quote_requests_status_idx ON quote_requests(status);
 CREATE INDEX IF NOT EXISTS quote_requests_created_idx ON quote_requests(created_at DESC);
 
@@ -93,6 +99,16 @@ const SEED_SETTINGS = [
   ['business_email',      'info@mulchparts.com',    'Public-facing contact email shown in footer'],
   ['hero_headline',       'American-made parts for mulch grinders & wood waste machinery', 'H1 on the homepage'],
   ['hero_subhead',        'Browse the catalog, request a quote, and our team will follow up with specs and pricing tailored to your machine.', 'Subhead under the H1'],
+  // Default to the in-docker URL so publishing works the moment the
+  // stack comes up — no dependency on the public DNS / cert being live.
+  // The PUBLIC URL (https://mulchparts-ntfy.pcc2k.com) is what phones
+  // use to subscribe; admins are pointed at it from the settings UI.
+  ['ntfy_url',            'http://ntfy:80', 'Internal URL the app posts to (default http://ntfy:80 inside docker)'],
+  // Topic name is seeded with a random suffix per-deploy so the topic
+  // isn't trivially guessable from the public URL alone. Override here
+  // or via the admin settings page.
+  ['ntfy_topic',          `mulchparts-quotes-${Math.random().toString(36).slice(2, 10)}`, 'Topic name on the ntfy server (keep hard to guess if anonymous)'],
+  ['ntfy_token',          '',                       'Optional Bearer token if the topic is access-controlled — leave blank for anonymous'],
 ];
 
 async function main() {

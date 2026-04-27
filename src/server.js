@@ -17,6 +17,7 @@ import 'dotenv/config';
 import { pool } from './db.js';
 import { settingsMiddleware, get as getSetting } from './settings.js';
 import { sendQuoteEmail } from './mailer.js';
+import { sendQuoteNotification } from './notifier.js';
 import { createAdminRouter } from './admin.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -236,18 +237,37 @@ app.post('/quote', async (req, res, next) => {
       ? `${baseUrl.replace(/\/$/, '')}/admin/requests/${requestId}`
       : null;
 
-    try {
-      await sendQuoteEmail({ request: { ...values, id: requestId }, part, partUrl, adminUrl });
+    // Email + push run in parallel — neither blocks the customer's
+    // thank-you, neither failure suppresses the other.
+    const fanout = await Promise.all([
+      sendQuoteEmail({ request: { ...values, id: requestId }, part, partUrl, adminUrl })
+        .then(() => ({ ok: true }))
+        .catch((e) => ({ ok: false, error: e instanceof Error ? e.message : String(e) })),
+      sendQuoteNotification({ request: { ...values, id: requestId }, part, partUrl, adminUrl }),
+    ]);
+    const [emailRes, ntfyRes] = fanout;
+    if (emailRes.ok) {
       await pool.query(
         `UPDATE quote_requests SET email_sent_at = NOW(), email_error = NULL WHERE id = $1`,
         [requestId],
       );
-    } catch (e) {
-      const msg = e instanceof Error ? e.message : String(e);
-      console.error('[quote] email send failed', msg);
+    } else {
+      console.error('[quote] email send failed', emailRes.error);
       await pool.query(
         `UPDATE quote_requests SET email_error = $2 WHERE id = $1`,
-        [requestId, msg.slice(0, 500)],
+        [requestId, String(emailRes.error).slice(0, 500)],
+      );
+    }
+    if (ntfyRes.ok) {
+      await pool.query(
+        `UPDATE quote_requests SET ntfy_sent_at = NOW(), ntfy_error = NULL WHERE id = $1`,
+        [requestId],
+      );
+    } else if (!ntfyRes.skipped) {
+      console.error('[quote] ntfy send failed', ntfyRes.error);
+      await pool.query(
+        `UPDATE quote_requests SET ntfy_error = $2 WHERE id = $1`,
+        [requestId, String(ntfyRes.error).slice(0, 500)],
       );
     }
 
