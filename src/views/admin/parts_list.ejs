@@ -65,6 +65,9 @@
             <td class="actions">
               <a href="/admin/parts/<%= p.id %>/edit" class="btn btn-secondary btn-sm">Edit</a>
               <a href="/parts/<%= p.id %>" target="_blank" class="btn btn-secondary btn-sm">View ↗</a>
+              <form action="/admin/parts/<%= p.id %>/delete" method="post" style="display:inline;" onsubmit="return confirm('Delete this part permanently? This cannot be undone.');">
+                <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+              </form>
             </td>
           </tr>
         <% }) %>

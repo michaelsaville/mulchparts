@@ -73,11 +73,14 @@
     <div class="form-actions">
       <button type="submit" class="btn btn-primary"><%= part ? 'Save changes' : 'Create part' %></button>
       <a href="/admin/parts" class="btn btn-secondary">Cancel</a>
-      <% if (part) { %>
-        <form action="/admin/parts/<%= part.id %>/delete" method="post" style="margin-left:auto;" onsubmit="return confirm('Delete this part? Quote requests linked to it will keep their copy of the part name.');">
-          <button type="submit" class="btn btn-danger">Delete part</button>
-        </form>
-      <% } %>
     </div>
   </form>
+
+  <% if (part) { %>
+    <%# Standalone form — must NOT be nested inside the edit form above, or the
+        browser drops the tags and "Delete" ends up submitting the edit form. %>
+    <form action="/admin/parts/<%= part.id %>/delete" method="post" class="delete-form" style="max-width:760px;" onsubmit="return confirm('Delete this part permanently? Quote requests linked to it will keep their copy of the part name.');">
+      <button type="submit" class="btn btn-danger">Delete part</button>
+    </form>
+  <% } %>
 <%- include('_layout_foot') %>

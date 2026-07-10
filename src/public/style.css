@@ -25,9 +25,11 @@ code, .mono { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-
 /* ─── Top bar ─── */
 .topbar { background: var(--navy); color: #fff; border-bottom: 4px solid var(--accent); position: sticky; top: 0; z-index: 20; }
 .topbar-inner { max-width: 1100px; margin: 0 auto; padding: 12px 20px; display: flex; align-items: center; gap: 18px; }
-.brand { color: #fff; display: flex; flex-direction: column; line-height: 1.1; }
+.brand { color: #fff; display: flex; flex-direction: column; gap: 4px; line-height: 1.1; }
 .brand-name { font-size: 1.15rem; font-weight: 700; letter-spacing: 0.02em; }
+.brand-logo { height: 32px; width: auto; display: block; }
 .brand-tag { font-size: 0.7rem; color: rgba(255,255,255,0.7); text-transform: uppercase; letter-spacing: 0.12em; }
+@media (max-width: 540px) { .brand-logo { height: 26px; } }
 .brand:hover { color: #fff; }
 .topnav { margin-left: auto; display: flex; gap: 22px; }
 .topnav a { color: #fff; font-weight: 500; padding: 4px 0; border-bottom: 2px solid transparent; }
@@ -126,6 +128,7 @@ h3 { font-size: 1.05rem; margin: 16px 0 8px; }
 .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
 @media (max-width: 520px) { .form-row { grid-template-columns: 1fr; } }
 .form-actions { display: flex; gap: 10px; margin-top: 6px; flex-wrap: wrap; }
+.delete-form { margin-top: 22px; padding-top: 18px; border-top: 1px solid var(--border-soft); }
 .fine { color: var(--muted); font-size: 0.85rem; margin: 8px 0 0; max-width: 640px; }
 
 .error-banner { background: var(--error-bg); border: 1px solid var(--error); color: var(--error); border-radius: 6px; padding: 10px 14px; margin-bottom: 14px; font-size: 0.9rem; }
@@ -150,6 +153,7 @@ h3 { font-size: 1.05rem; margin: 16px 0 8px; }
 .footer-inner { max-width: 1100px; margin: 0 auto; padding: 0 20px; display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
 @media (max-width: 540px) { .footer-inner { grid-template-columns: 1fr; } }
 .footer-brand { color: #fff; font-weight: 700; font-size: 1.05rem; margin-bottom: 4px; }
+.footer-logo { height: 40px; width: auto; display: block; margin-bottom: 10px; }
 .footer-line { font-size: 0.9rem; margin-bottom: 4px; }
 .footer-line a { color: rgba(255,255,255,0.85); }
 .footer-line a:hover { color: var(--accent); }
